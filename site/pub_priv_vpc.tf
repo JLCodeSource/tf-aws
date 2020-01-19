@@ -38,8 +38,9 @@ resource "aws_subnet" "public_subnets" {
   count = length(var.subnets)
 
   cidr_block = cidrsubnet(var.vpc_cidr, var.newbits, count.index)
+  availability_zone = var.subnets[count.index]
   tags = {
-    Name = "Public Subnet ${var.region}${var.az_num[count.index]}"
+    Name = "Public Subnet ${var.subnets[count.index]}"
   }
 }
 
@@ -49,6 +50,7 @@ resource "aws_subnet" "private_subnets" {
 
   cidr_block = cidrsubnet(var.vpc_cidr, var.newbits, count.index+4)
   tags = {
-    Name = "Private Subnet ${var.region}${var.az_num[count.index]}"
+    Name = "Private Subnet ${var.subnets[count.index]}"
+    availability_zone = var.subnets[count.index]
   }
 }

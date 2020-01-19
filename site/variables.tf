@@ -35,9 +35,5 @@ variable "newbits" {
 }
 
 variable "subnets" {
-  default = ["us-east1a","us-east1b","us-east1c",]
-}
-
-variable "az_num" {
-  default = ["a", "b", "c", "d"]
+  default = ["us-east-1a","us-east-1b","us-east-1c",]
 }
