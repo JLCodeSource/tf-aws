@@ -15,5 +15,4 @@ provider "aws" {
 
 module "site" {
   source = "./site"
-  
 }
