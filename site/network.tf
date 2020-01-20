@@ -12,7 +12,6 @@
 #
 # VPC
 #
-
 resource "aws_vpc" "trt" {
   cidr_block = var.vpc_cidr
   enable_dns_hostnames = true
@@ -50,13 +49,11 @@ resource "aws_subnet" "trt_pub" {
 # EIP
 #
 resource "aws_eip" "trt" {
-
   count = length(var.subnets)
 
   tags = {
     Name = "trt_eip_${var.subnets[count.index]}"
   }
-
 }
 
 #
@@ -67,11 +64,9 @@ resource "aws_nat_gateway" "trt" {
 
   allocation_id = element(aws_eip.trt.*.id, count.index)
   subnet_id = element(aws_subnet.trt_pub.*.id, count.index)
-
   tags = {
     Name = "trt_gw_${var.subnets[count.index]}"
   }
-
   depends_on = [aws_internet_gateway.trt]
 }
 
@@ -96,7 +91,6 @@ resource "aws_route_table" "trt_pub" {
   vpc_id = aws_vpc.trt.id
 
   count = length(var.subnets)
-
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.trt.id
@@ -122,7 +116,6 @@ resource "aws_route_table" "trt_prv" {
 # Private Route
 #
 resource "aws_route" "trt_prv" {
-
   count = length(var.subnets)
 
   destination_cidr_block = "0.0.0.0/0"
