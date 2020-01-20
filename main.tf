@@ -16,3 +16,12 @@ provider "aws" {
 module "site" {
   source = "./site"
 }
+
+module "security" {
+  source = "./security"
+  vpc_id = "${module.site.vpc_id}"
+  public_subnets = "${module.site.public_subnets}"
+  public_cidr_blocks = "${module.site.public_cidr_blocks}"
+  private_subnets = "${module.site.private_subnets}"
+  private_cidr_blocks = "${module.site.private_cidr_blocks}"
+}
