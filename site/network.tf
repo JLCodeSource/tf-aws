@@ -128,7 +128,7 @@ resource "aws_route" "trt_prv" {
 }
 
 #
-# Public Route
+# Public Route Association
 #
 resource "aws_route_table_association" "trt_pub" {
   count = length(var.subnets)
@@ -138,7 +138,7 @@ resource "aws_route_table_association" "trt_pub" {
 }
 
 #
-# Private Route
+# Private Route Assocation
 #
 resource "aws_route_table_association" "trt_prv" {
   count = length(var.subnets)
