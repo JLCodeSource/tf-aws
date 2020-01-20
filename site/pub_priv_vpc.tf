@@ -12,6 +12,7 @@
 resource "aws_vpc" "trt" {
   cidr_block = var.vpc_cidr
   enable_dns_hostnames = true
+  
   tags = {
       Name = "trt_vpc"
   }
@@ -23,17 +24,12 @@ resource "aws_internet_gateway" "trt" {
       Name = "trt_igw"
   }
 }
-output "vpc_id" {
-  value = aws_vpc.trt.id
-}
-
-### NAT Instance todo
 
 #
-# Subnets
+# Public Subnets
 #
 
-resource "aws_subnet" "trt_pub_subnets" {
+resource "aws_subnet" "trt_pub" {
   vpc_id = aws_vpc.trt.id
   count = length(var.subnets)
 
@@ -44,7 +40,39 @@ resource "aws_subnet" "trt_pub_subnets" {
   }
 }
 
-resource "aws_subnet" "trt_prv_subnets" {
+#
+# EIP
+#
+
+resource "aws_eip" "trt" {
+
+  count = length(var.subnets)
+
+  tags = {
+    Name = "trt_public_eip_${var.subnets[count.index]}"
+  }
+
+}
+
+#
+# NAT Gateways
+#
+
+resource "aws_nat_gateway" "trt" {
+  count = length(var.subnets)
+
+  allocation_id = element(aws_eip.trt.*.id, count.index)
+  subnet_id = element(aws_subnet.trt_pub.*.id, count.index)
+
+  tags = {
+    Name = "trt nat gateway ${var.subnets[count.index]}"
+  }
+
+}
+
+
+
+resource "aws_subnet" "trt_prv" {
   vpc_id = aws_vpc.trt.id
   count = length(var.subnets)
 
@@ -55,7 +83,11 @@ resource "aws_subnet" "trt_prv_subnets" {
   }
 }
 
-resource "aws_route_table" "trt_pub_rt" {
+#
+# Routing Tables
+#
+
+resource "aws_route_table" "trt_pub" {
   vpc_id = aws_vpc.trt.id
 
   count = length(var.subnets)
@@ -69,39 +101,38 @@ resource "aws_route_table" "trt_pub_rt" {
   }
 }
 
-resource "aws_route_table" "trt_prv_rt" {
+resource "aws_route_table" "trt_prv" {
   vpc_id = aws_vpc.trt.id
 
   count = length(var.subnets)
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.trt.id
-  }
   tags = {
-    Name = "trt_prv_route_table_${var.subnets[count.index]}"
+    Name = "trt_private_route_table_${var.subnets[count.index]}"
   }
 }
 
+resource "aws_route" "trt_prv" {
 
-locals {
-  trt_pub_subnets_ids = aws_subnet.trt_pub_subnets.*.id
-  trt_pub_rt_ids = aws_route_table.trt_pub_rt.*.id
-  trt_prv_subnets_ids = aws_subnet.trt_prv_subnets.*.id
-  trt_prv_rt_ids = aws_route_table.trt_prv_rt.*.id
+  count = length(var.subnets)
+
+  destination_cidr_block = "0.0.0.0/0"
+  route_table_id = element(aws_route_table.trt_prv.*.id, count.index)
+  nat_gateway_id = element(aws_nat_gateway.trt.*.id, count.index)
+
+  timeouts {
+    create = "5m"
+  }
 }
 
+resource "aws_route_table_association" "trt_pub" {
+  count = length(var.subnets)
 
-resource "aws_route_table_association" "trt_pub_subnets" {
-  count = length(local.trt_pub_rt_ids)
-
-  subnet_id = local.trt_pub_subnets_ids[count.index]
-  route_table_id = local.trt_pub_rt_ids[count.index]
+  subnet_id = element(aws_subnet.trt_pub.*.id, count.index)
+  route_table_id = element(aws_route_table.trt_pub.*.id, count.index)
 }
 
-resource "aws_route_table_association" "trt_prv_subnets" {
-  count = length(local.trt_prv_rt_ids)
+resource "aws_route_table_association" "trt_prv" {
+  count = length(var.subnets)
 
-  subnet_id = local.trt_prv_subnets_ids[count.index]
-  route_table_id = local.trt_prv_rt_ids[count.index]
+  subnet_id = element(aws_subnet.trt_prv.*.id, count.index)
+  route_table_id = element(aws_route_table.trt_prv.*.id, count.index)
 }
