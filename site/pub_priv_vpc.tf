@@ -9,6 +9,10 @@
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under the License.
 
+#
+# VPC
+#
+
 resource "aws_vpc" "trt" {
   cidr_block = var.vpc_cidr
   enable_dns_hostnames = true
@@ -18,6 +22,9 @@ resource "aws_vpc" "trt" {
   }
 }
 
+#
+#  IGW
+#
 resource "aws_internet_gateway" "trt" {
   vpc_id = aws_vpc.trt.id
   tags = {
@@ -28,7 +35,6 @@ resource "aws_internet_gateway" "trt" {
 #
 # Public Subnets
 #
-
 resource "aws_subnet" "trt_pub" {
   vpc_id = aws_vpc.trt.id
   count = length(var.subnets)
@@ -43,13 +49,12 @@ resource "aws_subnet" "trt_pub" {
 #
 # EIP
 #
-
 resource "aws_eip" "trt" {
 
   count = length(var.subnets)
 
   tags = {
-    Name = "trt_public_eip_${var.subnets[count.index]}"
+    Name = "trt_eip_${var.subnets[count.index]}"
   }
 
 }
@@ -57,7 +62,6 @@ resource "aws_eip" "trt" {
 #
 # NAT Gateways
 #
-
 resource "aws_nat_gateway" "trt" {
   count = length(var.subnets)
 
@@ -65,13 +69,15 @@ resource "aws_nat_gateway" "trt" {
   subnet_id = element(aws_subnet.trt_pub.*.id, count.index)
 
   tags = {
-    Name = "trt nat gateway ${var.subnets[count.index]}"
+    Name = "trt_gw_${var.subnets[count.index]}"
   }
 
+  depends_on = [aws_internet_gateway.trt]
 }
 
-
-
+#
+# Private Subnets
+#
 resource "aws_subnet" "trt_prv" {
   vpc_id = aws_vpc.trt.id
   count = length(var.subnets)
@@ -84,9 +90,8 @@ resource "aws_subnet" "trt_prv" {
 }
 
 #
-# Routing Tables
+# Public Routing Tables
 #
-
 resource "aws_route_table" "trt_pub" {
   vpc_id = aws_vpc.trt.id
 
@@ -101,6 +106,9 @@ resource "aws_route_table" "trt_pub" {
   }
 }
 
+#
+# Private Routing Tables
+#
 resource "aws_route_table" "trt_prv" {
   vpc_id = aws_vpc.trt.id
 
@@ -110,6 +118,9 @@ resource "aws_route_table" "trt_prv" {
   }
 }
 
+#
+# Private Route
+#
 resource "aws_route" "trt_prv" {
 
   count = length(var.subnets)
@@ -123,6 +134,9 @@ resource "aws_route" "trt_prv" {
   }
 }
 
+#
+# Public Route
+#
 resource "aws_route_table_association" "trt_pub" {
   count = length(var.subnets)
 
@@ -130,6 +144,9 @@ resource "aws_route_table_association" "trt_pub" {
   route_table_id = element(aws_route_table.trt_pub.*.id, count.index)
 }
 
+#
+# Private Route
+#
 resource "aws_route_table_association" "trt_prv" {
   count = length(var.subnets)
 
