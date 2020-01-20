@@ -23,10 +23,6 @@ variable "vpc_cidr" {
   default = "172.20.0.0/16"
 }
 
-variable "ip_range" {
-  default = "95.147.105.79/32"
-}
-
 variable "newbits" {
   # cidrsubnet(prefix, newbits, netnum)
   # With a 172.20.0.0/16 cidr, newbits of 2 => 16k IPs, 3 => 8k, 2 => 4k
@@ -35,5 +31,6 @@ variable "newbits" {
 }
 
 variable "subnets" {
+  # Note - at 3 newbits, cannot have more than 4 subnets
   default = ["us-east-1a","us-east-1b","us-east-1c",]
 }
