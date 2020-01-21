@@ -119,6 +119,24 @@ variable "computed_ingress_with_source_security_group_id" {
   default     = []
 }
 
+variable "computed_ingress_cidr_blocks" {
+  description = "List of IPv4 CIDR ranges to use on all computed ingress rules"
+  type        = list(string)
+  default     = []
+}
+
+variable "computed_ingress_ipv6_cidr_blocks" {
+  description = "List of IPv6 CIDR ranges to use on all computed ingress rules"
+  type        = list(string)
+  default     = []
+}
+
+variable "computed_ingress_prefix_list_ids" {
+  description = "List of prefix list IDs (for allowing access to VPC endpoints) to use on all computed ingress rules"
+  type        = list(string)
+  default     = []
+}
+
 ###################################
 # Number of computed ingress rules
 ###################################
@@ -148,6 +166,24 @@ variable "number_of_computed_ingress_with_ipv6_cidr_blocks" {
 
 variable "number_of_computed_ingress_with_source_security_group_id" {
   description = "Number of computed ingress rules to create where 'source_security_group_id' is used"
+  type        = number
+  default     = 0
+}
+
+variable "number_of_computed_ingress_cidr_blocks" {
+  description = "Number of IPv4 CIDR ranges to use on all computed ingress rules"
+  type        = number
+  default     = 0
+}
+
+variable "number_of_computed_ingress_ipv6_cidr_blocks" {
+  description = "Number of IPv6 CIDR ranges to use on all computed ingress rules"
+  type        = number
+  default     = 0
+}
+
+variable "number_of_computed_ingress_prefix_list_ids" {
+  description = "Number of prefix list IDs (for allowing access to VPC endpoints) to use on all computed ingress rules"
   type        = number
   default     = 0
 }
@@ -236,6 +272,24 @@ variable "computed_egress_with_source_security_group_id" {
   default     = []
 }
 
+variable "computed_egress_cidr_blocks" {
+  description = "List of IPv4 CIDR ranges to use on all computed egress rules"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "computed_egress_ipv6_cidr_blocks" {
+  description = "List of IPv6 CIDR ranges to use on all computed egress rules"
+  type        = list(string)
+  default     = ["::/0"]
+}
+
+variable "computed_egress_prefix_list_ids" {
+  description = "List of prefix list IDs (for allowing access to VPC endpoints) to use on all computed egress rules"
+  type        = list(string)
+  default     = []
+}
+
 ##################################
 # Number of computed egress rules
 ##################################
@@ -265,6 +319,24 @@ variable "number_of_computed_egress_with_ipv6_cidr_blocks" {
 
 variable "number_of_computed_egress_with_source_security_group_id" {
   description = "Number of computed egress rules to create where 'source_security_group_id' is used"
+  type        = number
+  default     = 0
+}
+
+variable "number_of_computed_egress_cidr_blocks" {
+  description = "Number of IPv4 CIDR ranges to use on all computed egress rules"
+  type        = number
+  default     = 0
+}
+
+variable "number_of_computed_egress_ipv6_cidr_blocks" {
+  description = "Number of IPv6 CIDR ranges to use on all computed egress rules"
+  type        = number
+  default     = 0
+}
+
+variable "number_of_computed_egress_prefix_list_ids" {
+  description = "Number of prefix list IDs (for allowing access to VPC endpoints) to use on all computed egress rules"
   type        = number
   default     = 0
 }
