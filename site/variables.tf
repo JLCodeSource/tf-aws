@@ -34,3 +34,6 @@ variable "subnets" {
   # Note - at 3 newbits, cannot have more than 4 subnets
   default = ["us-east-1a","us-east-1b","us-east-1c",]
 }
+
+### From Main Module
+variable "cluster_name" {}

@@ -18,6 +18,7 @@ resource "aws_vpc" "trt" {
   
   tags = {
       Name = "trt_vpc"
+      "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 }
 
@@ -42,6 +43,9 @@ resource "aws_subnet" "trt_pub" {
   availability_zone = var.subnets[count.index]
   tags = {
     Name = "trt_public_subnet_${var.subnets[count.index]}"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                      = "1"
+ 
   }
 }
 
@@ -81,6 +85,8 @@ resource "aws_subnet" "trt_prv" {
   tags = {
     Name = "trt_private_subnet_${var.subnets[count.index]}"
     availability_zone = var.subnets[count.index]
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    "kubernetes.io/role/internal-elb"             = "1"
   }
 }
 

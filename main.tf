@@ -15,6 +15,7 @@ provider "aws" {
 
 module "site" {
   source = "./site"
+  cluster_name = "${var.cluster_name}"
 }
 
 module "security" {
