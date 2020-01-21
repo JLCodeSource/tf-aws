@@ -82,9 +82,9 @@ resource "aws_subnet" "trt_prv" {
   count = length(var.subnets)
 
   cidr_block = cidrsubnet(var.vpc_cidr, var.newbits, count.index+4)
+  availability_zone = var.subnets[count.index]
   tags = {
     Name = "trt_private_subnet_${var.subnets[count.index]}"
-    availability_zone = var.subnets[count.index]
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
     "kubernetes.io/role/internal-elb"             = "1"
   }
